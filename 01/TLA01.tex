@@ -1,0 +1,144 @@
+\documentclass{beamer}
+\usetheme[progressbar=frametitle]{metropolis}
+\setbeamertemplate{frame numbering}[fraction]
+\useoutertheme{metropolis}
+\useinnertheme{metropolis}
+\usefonttheme{metropolis}
+
+% Barra de progreso más ancha
+\makeatletter
+\setlength{\metropolis@titleseparator@linewidth}{2pt}
+\setlength{\metropolis@progressonsectionpage@linewidth}{2pt}
+\setlength{\metropolis@progressinheadfoot@linewidth}{2pt}
+\makeatother
+
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage[compatibility=false]{caption}
+\usepackage[listings,theorems]{tcolorbox}
+\usepackage{minted}
+\usepackage{url}
+
+\usemintedstyle{friendly}
+
+\DeclareCaptionFont{captionfont}{\fontsize{8}{8}\selectfont}
+\captionsetup{font=captionfont}
+
+\title{Especificación y Verificación Formal de Sistemas Distribuidos con TLA+}
+\subtitle{01. Introducción}
+\author{Axel Suárez Polo}
+\institute{BUAP}
+\date{\today}
+
+\begin{document}
+
+\begin{frame}
+  \titlepage
+\end{frame}
+
+\begin{frame}[t]
+  \frametitle{Contenidos}
+  \tableofcontents
+\end{frame}
+
+\section{¿Por qué aprender TLA+?}
+
+\begin{frame}
+  \frametitle{¿Por qué aprender TLA+?}
+
+  \begin{itemize}
+    \item Escribir la \emph{especificación} de un sistema ayuda a entenderlo
+    \item Es buena idea entender un sistema antes de implementarlo.
+    \item Por lo tanto, es buena idea \emph{especificar} un sistema antes de implementarlo.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{¿Por qué aprender TLA+?}
+
+  \begin{itemize}
+    \item La especificación de un sistema puede ir desde simple prosa, hasta
+          una especificación matemática, como ocurre en la ciencia y la ingeniería.
+          \begin{itemize}
+            \item En la realidad, los planetas tienen montañas, océanos, olas, clima, etc
+            \item Pero los podemos modelar como puntos de masa con posición y momento
+          \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{¿Por qué aprender TLA+?}
+
+  \begin{itemize}
+    \item Este mismo método científico lo podemos aplicar a los programas:
+          \begin{itemize}
+            \item En la realidad, hay procesos físicos ocurriendo en las computadoras,
+              transistores cambiando de estado, diferencias de voltaje, etc. \\
+              Incluso a un nivel de abstracción más alto existen direcciones de
+              memoria, estados de registros, etc.
+            \item Pero podemos describir lo que hace una computadora con modelos como las
+              \textbf{máquinas de Turing}, el \textbf{cálculo lambda}, etc.
+          \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{¿Por qué aprender TLA+?}
+
+  \begin{itemize}
+    \item TLA+ nos da un modelo para razonar sobre casi cualquier sistema discreto
+          \cite{lamport1999specifying}.
+          \begin{itemize}
+            \item Diseño de hardware \cite{lamport2001wildfire}.
+            \item Sistemas concurrentes y distribuidos \cite{newcombe2015amazon}.
+            \item Sistemas operativos \cite{verhulst2011formal}.
+            \item Algoritmos como 2PC, Paxos, alojamiento de memoria, etc \cite{githubtla}.
+          \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\section{¿Qué es TLA+ y TLC?}
+
+\begin{frame}
+  \frametitle{¿Qué es TLA+?}
+
+  \begin{itemize}
+    \item TLA+ un lenguaje de alto nivel para modelar sistemas digitales. \cite{tlacourse}.
+          \begin{itemize}
+            \item \textbf{sistemas digitales} abarca tanto algoritmos como sistemas de computadoras.
+            \item \textbf{alto nivel} hace referencia a que se está hablando a nivel de diseño y no de código ejecutable.
+          \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{¿Qué es TLC?}
+
+  \begin{itemize}
+    \item TLC es una herramienta para verificar estos modelos automáticamente.
+          \begin{itemize}
+            \item Estas herramientas permiten encontrar y corregir errores de diseño. Hoy en día los errores de diseño ocupan los primeros lugares en vulnerabilidades de seguridad \cite{owasp4}.
+          \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\section{¿Por qué no aprender TLA+?}
+
+\begin{frame}
+  \frametitle{¿Por qué no aprender TLA+?}
+
+  \begin{itemize}
+    \item En el espectro de los métodos formales, TLA+ presenta una dificultad mayor a la de los sitemas de tipos de lenguajes como C o Java \cite{fisher2017hacms}.
+    \item Existe software simple de escribir y software difícil de escribir.
+    \item Existe software crítico y software que no lo es.
+    \item \textbf{No se puede verificar que el software implementado efectivamente sigue la especificación.}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[allowframebreaks]
+        \frametitle{Referencias}
+        \bibliographystyle{amsalpha}
+        \bibliography{./refs.bib}
+\end{frame}
+
+\end{document}
