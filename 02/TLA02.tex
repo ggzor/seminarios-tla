@@ -1,0 +1,246 @@
+\documentclass{beamer}
+\usetheme[progressbar=frametitle]{metropolis}
+\setbeamertemplate{frame numbering}[fraction]
+\useoutertheme{metropolis}
+\useinnertheme{metropolis}
+\usefonttheme{metropolis}
+
+% Barra de progreso más ancha
+\makeatletter
+\setlength{\metropolis@titleseparator@linewidth}{2pt}
+\setlength{\metropolis@progressonsectionpage@linewidth}{2pt}
+\setlength{\metropolis@progressinheadfoot@linewidth}{2pt}
+\makeatother
+
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage[compatibility=false,justification=centering]{caption}
+\usepackage[listings,theorems]{tcolorbox}
+\usepackage{minted}
+\usepackage{url}
+\usepackage{svg}
+
+\usemintedstyle{friendly}
+
+\DeclareCaptionFont{captionfont}{\fontsize{8}{8}\selectfont}
+\captionsetup{font=captionfont}
+
+\title{Especificación y Verificación Formal de Sistemas Distribuidos con TLA+}
+\subtitle{02. Principios de TLA+ y PlusCal}
+\author{Axel Suárez Polo}
+\institute{BUAP}
+\date{\today}
+
+\begin{document}
+
+\begin{frame}
+  \titlepage
+\end{frame}
+
+\begin{frame}[t]
+  \frametitle{Contenidos}
+  \tableofcontents
+\end{frame}
+
+\section{Modelando programas con TLA+}
+
+\begin{frame}
+  \frametitle{Modelando programas con TLA+}
+
+  \begin{itemize}
+    \item La especificación de un sistema puede ir desde simple prosa, hasta
+          una especificación matemática, como ocurre en la ciencia y la ingeniería.
+          \begin{itemize}
+            \item En la realidad, los planetas tienen montañas, océanos, olas, clima, etc
+            \item Pero los podemos modelar como puntos de masa con posición y momento
+          \end{itemize}
+    \item TLA+ permite hacer lo mismo pero con los programas
+  \end{itemize}
+\end{frame}
+
+\section{El modelo de comportamientos}
+
+\begin{frame}
+  \frametitle{El modelo de comportamientos}
+
+  \begin{itemize}
+    \item TLA+ utiliza el \emph{modelo de comportamientos}
+    \item La ejecución de un programa es representada por un \textbf{comportamiento}.
+    \item Un \textbf{comportamiento} es una secuencia ordenada de \textbf{estados}, ya sea finita o infinita.
+    \item Un \textbf{estado} es una asignación de valores a variables.
+
+    \item Un \textbf{programa} es modelado por un conjunto de \textbf{comportamientos}.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{El modelo de comportamientos}
+
+  \begin{figure}[h]
+      \centering
+      \includesvg[width=\textwidth]{assets/semaforo_comportamiento}
+      \caption{El comportamiento de un semáforo}
+      \label{fig:sem}
+  \end{figure}
+
+\end{frame}
+
+\begin{frame}
+  \frametitle{El modelo de comportamientos}
+
+  \begin{itemize}
+    \item \emph{Un programa es modelado por todas sus posibles ejecuciones.}
+    \item TLA+ nos permite especificar de forma precisa y concisa \emph{todas} las ejecuciones posibles de un programa.
+  \end{itemize}
+\end{frame}
+
+\section{Un semáforo en TLA+}
+
+\begin{frame}[fragile]
+  \frametitle{Semáforo en TLA+}
+
+  \begin{listing}[H]
+    \begin{center}
+      \begin{minipage}{0.7\textwidth}
+        \begin{minted}[autogobble,linenos,mathescape,fontsize=\scriptsize]{idris}
+            VARIABLE color
+            SInit == color = "verde"
+            SNext == IF color = "verde"
+                     THEN color' = "amarillo"
+                     ELSE IF color = "amarillo"
+                          THEN color' = "rojo"
+                          ELSE color' = "verde"
+            Spec == SInit /\ [][SNext]_color
+
+            TypeInvariant == color \in {"verde", "amarillo", "rojo"}
+            ----
+            THEOREM Spec => []TypeInvariant
+        \end{minted}
+      \end{minipage}
+    \end{center}
+    \caption{Semáforo en TLA+}
+    \label{lst:sem_tla}
+  \end{listing}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Sintaxis}
+
+  La sintaxis es la siguiente:
+
+  \begin{itemize}
+    \item \mintinline{idris}|VARIABLE v1, v2, ...| declara las variables $v1, v2, ...$
+    \item \mintinline{idris}|Ident == e1| define el identificador $Ident$ como la expresión $e1$.
+          Es idéntico a \mintinline{c}|#define Ident e1| en C.
+          \footnote{Permite la \emph{Transparencia Referencial}.}
+    \item \mintinline{idris}|e1 = e2| realiza la aserción de que $e1$ es \emph{igual} a $e2$.
+          Parecido a \mintinline{c}|e1 == e2| en C,
+          pero también puede especificar el valor inicial de una variable.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Sintaxis}
+
+  La sintaxis es la siguiente:
+
+  \begin{itemize}
+    \item \mintinline{idris}|id' = e1| asigna al \textbf{siguiente estado} de la variable $id$
+          el valor de la expresión $e1$.
+    \item \mintinline{idris}|e1 /\ e2| \emph{and} lógico. Parecido a \mintinline{c}|e1 && e2| en C
+          \footnote{La diferencia es que \mintinline{idris}|e1 /\ e2| no infiere control de flujo.}.
+    \item \mintinline{idris}|[][e1]_e2| aserción de que la propiedad $e1$ se cumple \textbf{siempre}
+          o no ocurre cambio en las variables.
+          \footnote{Considerar que no haya cambio en las variables permite el \emph{stuttering}.}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Sintaxis}
+
+  La sintaxis es la siguiente:
+
+  \begin{itemize}
+    \item \mintinline{idris}|e1 \in e2| realiza la aserción de que $e1$
+          pertenece al conjunto $e2$. Si $e1$ es un identificador y es el
+          estado inicial, entonces $e1$ toma todos los valores de $e2$.
+    \item \mintinline{idris}|{e1, e2, ...}| el conjunto conformado por $e1$, $e2$, etc.
+    \item \mintinline{idris}|e1 => e2| $e1$ implica lógicamente $e2$.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Transparencia Referencial}
+
+  \emph{Una variable puede ser reemplazada por su valor sin alterar el programa.}
+
+  No se cumple en lenguajes imperativos en general, pero sí en TLA+ y en lenguajes funcionales puros.
+
+  \begin{listing}[H]
+    \begin{center}
+      \begin{minipage}{0.7\textwidth}
+        \begin{minted}[autogobble,linenos,mathescape,fontsize=\tiny]{c}
+        #include <stdio.h>
+
+        int f() {
+          printf("Hola\n");
+          return 2;
+        }
+
+        int main() {
+          int x = f();
+          int valor = x + x;
+          // int valor = f() + f();
+          printf("%d\n", valor);
+        }
+        \end{minted}
+      \end{minipage}
+    \end{center}
+    \caption{Transparencia Referencial no aplica en C}
+    \label{lst:c_ref}
+  \end{listing}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Stuttering}
+
+  Permitir pasos que no cambian las variables (\emph{stuttering steps}) permite
+  una mejor \textbf{composición} (reutilización) de las especificaciones.
+
+  \begin{figure}[h]
+      \centering
+      \includesvg[height=1.6in]{assets/stuttering}
+      \caption{Composición de especificaciones con \emph{stuttering}.}
+      \label{fig:sem}
+  \end{figure}
+\end{frame}
+
+\section{Un semáforo en PlusCal}
+
+\begin{frame}[fragile]
+  \frametitle{Semáforo en PlusCal}
+
+  \begin{listing}[H]
+    \begin{center}
+      \begin{minipage}{0.5\textwidth}
+        \begin{minted}[autogobble,linenos,mathescape,fontsize=\scriptsize]{idris}
+            variable color = "verde";
+
+            while TRUE do
+              if color = "verde" then
+                color := "amarillo";
+              elsif color = "amarillo" then
+                color := "rojo";
+              else
+                color := "verde";
+              end if;
+            end while;
+        \end{minted}
+      \end{minipage}
+    \end{center}
+    \caption{Semáforo en PlusCal}
+    \label{lst:sem_pluscal}
+  \end{listing}
+\end{frame}
+
+\end{document}
