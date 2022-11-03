@@ -1,0 +1,324 @@
+\documentclass{beamer}
+\usetheme[progressbar=frametitle]{metropolis}
+\setbeamertemplate{frame numbering}[fraction]
+\useoutertheme{metropolis}
+\useinnertheme{metropolis}
+\usefonttheme{metropolis}
+
+% Barra de progreso más ancha
+\makeatletter
+\setlength{\metropolis@titleseparator@linewidth}{2pt}
+\setlength{\metropolis@progressonsectionpage@linewidth}{2pt}
+\setlength{\metropolis@progressinheadfoot@linewidth}{2pt}
+\makeatother
+
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage[compatibility=false,justification=centering]{caption}
+\usepackage[listings,theorems]{tcolorbox}
+\usepackage{minted}
+\usepackage{url}
+\usepackage{svg}
+\usepackage{amsmath}
+\usepackage{mathtools}
+\usepackage{graphicx}
+
+\usemintedstyle{friendly}
+
+\DeclareCaptionFont{captionfont}{\fontsize{8}{8}\selectfont}
+\captionsetup{font=captionfont}
+
+\title{Especificación y Verificación Formal de Sistemas Distribuidos con TLA+}
+\subtitle{03. Máquinas de estados}
+\author{Axel Suárez Polo}
+\institute{BUAP}
+\date{\today}
+
+\begin{document}
+
+\begin{frame}
+  \titlepage
+\end{frame}
+
+\begin{frame}[t]
+  \frametitle{Contenidos}
+  \tableofcontents
+\end{frame}
+
+\section{Modelando un programa de C}
+
+\begin{frame}[fragile]
+  \frametitle{Programa en C}
+
+  ¿Cómo modelar el siguiente programa?
+
+  \begin{listing}[H]
+    \begin{center}
+      \begin{minipage}{0.7\textwidth}
+        \inputminted{c}{code/program.c}
+      \end{minipage}
+    \end{center}
+    \caption{Programa en C}
+    \label{lst:cprogram_1}
+  \end{listing}
+\end{frame}
+
+\begin{frame}
+  \frametitle{El modelo de comportamientos}
+
+  TLA+ utiliza el \emph{modelo de comportamientos}.
+
+  \begin{itemize}
+    \item La ejecución de un programa es representada por un \textbf{comportamiento}.
+    \item Un \textbf{comportamiento} es una secuencia ordenada de \textbf{estados}, ya sea finita o infinita.
+    \item Un \textbf{estado} es una asignación de valores a variables.
+
+    \item Un \textbf{programa} es modelado por un conjunto de \textbf{comportamientos}.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{El modelo de comportamientos}
+
+  \begin{figure}[h]
+      \centering
+      \includesvg[width=\textwidth]{assets/semaforo_comportamiento}
+      \caption{El comportamiento de un semáforo}
+      \label{fig:sem_behavior}
+  \end{figure}
+
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Pasos para modelar un programa}
+
+  Para modelar un programa o sistema con TLA+ tenemos que saber 3 cosas:
+
+  \begin{itemize}
+    \item \textbf{Variables} del sistema
+    \item \textbf{Estado} inicial
+    \item Relación entre el \textbf{estado} actual y el \textbf{estado} siguiente
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Programa en C}
+
+  ¿Cuáles son las \textbf{variables},
+                  \textbf{estado inicial} y
+                  \textbf{relación entre estados} del programa?
+
+  \begin{listing}[H]
+    \begin{center}
+      \begin{minipage}{0.7\textwidth}
+        \inputminted{c}{code/program.c}
+      \end{minipage}
+    \end{center}
+    \caption{Programa en C}
+    \label{lst:cprogram_2}
+  \end{listing}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Pensando en comportamientos}
+
+  Una forma de determinar esto es pensando en los comportamientos del programa.
+
+  \begin{figure}
+    \begin{center}
+      \begin{equation*}
+        \begingroup
+        \setlength\arraycolsep{1pt}
+        \begin{aligned}
+          \begin{bmatrix*}
+            \textbf{i} &:& 0
+          \end{bmatrix*}
+          \rightarrow
+          \begin{bmatrix*}
+            \textbf{i} &:& 10
+          \end{bmatrix*}
+          \rightarrow
+          \begin{bmatrix*}
+            \textbf{i} &:& 11
+          \end{bmatrix*}
+        \end{aligned}
+        \endgroup
+      \end{equation*}
+      \pause
+      \begin{equation*}
+        \begingroup
+        \setlength\arraycolsep{1pt}
+        \begin{aligned}
+          \begin{bmatrix*}
+            \textbf{i} &:& 0
+          \end{bmatrix*}
+          \rightarrow
+          \begin{bmatrix*}
+            \textbf{i} &:& 99
+          \end{bmatrix*}
+          \rightarrow
+          \begin{bmatrix*}
+            \textbf{i} &:& 100
+          \end{bmatrix*}
+        \end{aligned}
+        \endgroup
+      \end{equation*}
+    \end{center}
+
+    \caption{Posibles comportamientos del programa}
+    \label{lst:cprogram_behavior}
+  \end{figure}
+
+\end{frame}
+
+\section{Programar 1: Programa en C}
+
+\begin{frame}
+  \frametitle{El modelo de comportamientos}
+
+  \begin{itemize}
+    \item Un \emph{comportamiento} \textbf{siempre es lineal}.
+    \item El modelo de comportamientos requiere pensar sobre las relaciones entre los
+          estados.
+    \item El \textbf{conjunto de comportamientos} es la especificación del programa.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Pensando en comportamientos}
+
+  Tenemos que usar una fórmula lógica para representar la relación entre
+  estados, lo que es imposible con las variables actuales.
+
+  \begin{figure}
+    \begin{center}
+      \begin{equation*}
+        \begingroup
+        \setlength\arraycolsep{1pt}
+        \begin{aligned}
+          \begin{bmatrix*}
+            \textbf{i} &:& 0
+          \end{bmatrix*}
+          \rightarrow
+          \begin{bmatrix*}
+            \textbf{i} &:& 10
+          \end{bmatrix*}
+          \rightarrow
+          \begin{bmatrix*}
+            \textbf{i} &:& 11
+          \end{bmatrix*}
+        \end{aligned}
+        \endgroup
+      \end{equation*}
+      \begin{equation*}
+        \begingroup
+        \setlength\arraycolsep{1pt}
+        \begin{aligned}
+          \begin{bmatrix*}
+            \textbf{i} &:& 0
+          \end{bmatrix*}
+          \rightarrow
+          \begin{bmatrix*}
+            \textbf{i} &:& 11
+          \end{bmatrix*}
+          \rightarrow
+          \begin{bmatrix*}
+            \textbf{i} &:& 12
+          \end{bmatrix*}
+        \end{aligned}
+        \endgroup
+      \end{equation*}
+    \end{center}
+
+    \caption{Posibles comportamientos del programa}
+    \label{lst:cprogram_behavior}
+  \end{figure}
+
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Estado oculto}
+
+  Los lenguajes de programación convencionales ocultan estado en diversas
+  formas: \textbf{variables},
+          \textbf{apuntador de instrucción},
+          \textbf{pila de llamadas},
+          \textbf{memoria dinámica}, etc.
+
+  \begin{listing}[H]
+    \begin{center}
+      \begin{minipage}{0.7\textwidth}
+        \begin{minted}[autogobble,linenos,mathescape,fontsize=\scriptsize]{c}
+          int i = 0;             // pc = "start"
+          int main() {
+            i = obtenerNumero(); // pc = "middle"
+            i = i + 1;           // pc = "end"
+          }
+        \end{minted}
+      \end{minipage}
+    \end{center}
+    \caption{El programa en C con anotaciones}
+    \label{lst:cprogram_hidden}
+  \end{listing}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Pensando en comportamientos}
+
+  TLA+ requiere que pensemos en todo el estado de un sistema para la especificación.
+
+  \begin{figure}
+    \begin{center}
+      \begin{equation*}
+        \begingroup
+        \setlength\arraycolsep{1pt}
+        \begin{aligned}
+          \begin{bmatrix*}
+            \textbf{i} &:& 0 \\
+            \textbf{pc}&:& ``start"
+          \end{bmatrix*}
+          \rightarrow
+          \begin{bmatrix*}
+            \textbf{i} &:& 10 \\
+            \textbf{pc}&:& ``middle"
+          \end{bmatrix*}
+          \rightarrow
+          \begin{bmatrix*}
+            \textbf{i} &:& 11 \\
+            \textbf{pc}&:& ``end"
+          \end{bmatrix*}
+        \end{aligned}
+        \endgroup
+      \end{equation*}
+      \begin{equation*}
+        \begingroup
+        \setlength\arraycolsep{1pt}
+        \begin{aligned}
+          \begin{bmatrix*}
+            \textbf{i} &:& 0 \\
+            \textbf{pc}&:& ``start"
+          \end{bmatrix*}
+          \rightarrow
+          \begin{bmatrix*}
+            \textbf{i} &:& 11 \\
+            \textbf{pc}&:& ``middle"
+          \end{bmatrix*}
+          \rightarrow
+          \begin{bmatrix*}
+            \textbf{i} &:& 12 \\
+            \textbf{pc}&:& ``end"
+          \end{bmatrix*}
+        \end{aligned}
+        \endgroup
+      \end{equation*}
+    \end{center}
+
+    \caption{Posibles comportamientos del programa}
+    \label{lst:cprogram_behavior_good}
+  \end{figure}
+
+\end{frame}
+
+\section{Programar 2: Programa en C (revisado)}
+
+\end{document}
